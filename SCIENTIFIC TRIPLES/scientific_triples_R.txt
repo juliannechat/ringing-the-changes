@@ -1,0 +1,113 @@
+# Bryn Reinstadler
+# 26 June 2018
+# Produces all rows of a true peal of 
+# Scientific Triples, based on a composition
+# by Roger Bailey (below).
+
+library(stringr)
+
+# takes a change and makes places
+# can also take places as a list
+# 'x' means 'all cross'
+make_places <- function(change, places, return.all.changes=F) {
+  new.change <- change
+  if(return.all.changes) {
+    changes.mat <- matrix(c(0),nrow=length(places), ncol=length(change))
+  }
+  for(i in 1:length(places)) {
+    change <- new.change
+    place <- unlist(str_split(places[i],""))
+    if( all(place == "x") & length(change) %%2 == 0) { # all cross
+      swappers <- seq(1, length(change))
+      for(j in seq(1, length(swappers), by=2)) {
+        new.change[swappers[j]] <- change[swappers[j+1]]
+        new.change[swappers[j+1]] <- change[swappers[j]]
+      }
+    } else if( (length(change) - length(place)) %% 2 == 0) {
+      place <- as.numeric(place)
+      swappers <- seq(1, length(change))[-place]
+      for(j in seq(1, length(swappers), by=2)) {
+        new.change[swappers[j]] <- change[swappers[j+1]]
+        new.change[swappers[j+1]] <- change[swappers[j]]
+      }
+    } else {
+      print("Cannot swap odd number of bells...")
+    }
+    if(return.all.changes) {
+      changes.mat[i,] <- new.change
+    }
+  }
+  if(return.all.changes) {
+    return(changes.mat)
+  }
+  return(new.change)
+}
+
+plain.lead.st <- c("3","1","7","1","5","1","7","1","7","5",
+                   "1","7","1","7","1","7","1","7","1","5",
+                   "1","5","1","7","1","7","1","7","1","7")
+bailey.single <- c("34567")
+
+# 5040 Scientific Triples
+# Roger Bailey
+# 
+# 123456   2  6  7
+# ________________
+# 541632   s (s) s
+# 514362   a     s
+# 653421   s  s   
+# ________________
+# 8 part. Omit (s) except in parts 1 + 5.
+# a = s in parts 2, 4, 6 and 8. 
+# 
+# Single made by substituting 34567 for 7ths 
+# at the 25th row of a division (type C single).
+# 
+# (Ref: Ringing World 1981 p1096, 1982 p100 and 392)
+#
+# http://community.dur.ac.uk/m.j.durham/bells/peals/triples.html#scientific
+rounds = c(1,2,3,4,5,6,7)
+tmp <- rounds
+write.table(matrix(rounds,ncol=7,nrow=1),
+            file="scientific_triples_5040.txt",
+            append=F,quote=F, row.names = F,
+            col.names=F)
+for(p in 1:8) {
+  for(s in 1:3) {
+    for(i in 1:7) {
+      
+      if(i %in% c(2,6,7)) { # all the perturbations happen at 2,6,7
+        perturbed.lead <- plain.lead.st
+        if(s == 1 & p %in% c(1,5)) {
+          perturbed.lead[24] = bailey.single
+        } else if(s == 1 & i %in% c(2,7)) {
+          perturbed.lead[24] = bailey.single
+        }
+        
+        if(s == 2 & p %in% c(2,4,6,8) & i == 2) {
+          perturbed.lead[24] = bailey.single
+        } else if(s == 2 & i == 7) {
+          perturbed.lead[24] = bailey.single
+        }
+        
+        if(s==3 & i %in% c(2,6)) {
+          perturbed.lead[24] = bailey.single
+        }
+        
+        write.table(make_places(tmp, perturbed.lead, return.all.changes = T),
+                    file="scientific_triples_5040.txt",
+                    append=T,quote=F, row.names = F,
+                    col.names=F)
+        tmp <- make_places(tmp, perturbed.lead)
+        
+      } else {
+        write.table(make_places(tmp, plain.lead.st, return.all.changes = T),
+                    file="scientific_triples_5040.txt",
+                    append=T,quote=F, row.names = F,
+                    col.names=F)
+        tmp <- make_places(tmp, plain.lead.st)
+        
+      }
+    }
+  }
+}
