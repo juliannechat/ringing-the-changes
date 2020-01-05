@@ -1,5 +1,5 @@
 #!/usr/bin/python
-__author__ = 'Anne Marie Merritt, a.m.merritt@gmail.com'
+__author__ = 'Anne Marie Merritt, anne.marie.merritt@gmail.com'
 '''
     License: MIT
 
@@ -155,8 +155,8 @@ def _fetch_random_line(group_index):
 
 def _parse_ringtones(ringfile, outfile):
     '''
-    :param ringtone_filename:  Name of bells file to parse
-    :param outputfilename:  Output file to emit random lines to
+    :param ringfile:  Name of bells file to parse
+    :param outfile:  Output file to emit random lines to
     :return: No return.
     '''
 
